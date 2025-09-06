@@ -1,0 +1,7 @@
+{
+  "name": "civic-pulse-frontend",
+  "buildCommand": "cd frontend/civic-pulse-frontend && npm run build",
+  "outputDirectory": "frontend/civic-pulse-frontend/build",
+  "framework": "create-react-app",
+  "installCommand": "cd frontend/civic-pulse-frontend && npm install"
+}
