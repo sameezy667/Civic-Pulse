@@ -24,7 +24,7 @@ import AdminDashboard from './AdminDashboard';
 // Types
 type ActiveSection = 'dashboard' | 'community' | 'map' | 'reports' | 'account' | 'settings' | 'admin' | 'new-report';
 
-// Miata 3D Model Component with auto-rotation
+// Enhanced Miata 3D Model Component with auto-rotation and grounding shadow
 const MiataModel = () => {
   const meshRef = useRef<THREE.Group>(null);
   
@@ -42,14 +42,62 @@ const MiataModel = () => {
     return null;
   }
 
+  // Ensure materials are compatible with Three.js v0.179
+  useEffect(() => {
+    if (gltf.scene) {
+      gltf.scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          if (mesh.material) {
+            // Ensure material compatibility
+            if (Array.isArray(mesh.material)) {
+              mesh.material.forEach((mat) => {
+                if (mat.map) mat.map.flipY = false;
+              });
+            } else {
+              if (mesh.material.map) mesh.material.map.flipY = false;
+            }
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+          }
+        }
+      });
+    }
+  }, [gltf.scene]);
+
   return (
-    <primitive 
-      ref={meshRef}
-      object={gltf.scene} 
-      scale={[1.8, 1.8, 1.8]} 
-      position={[0, -0.8, 0]} 
-      rotation={[0, 0, 0]}
-    />
+    <group>
+      {/* Enhanced grounding shadow for visual depth */}
+      <mesh position={[0, -1.2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[2.8, 64]} />
+        <meshLambertMaterial 
+          color="#000000" 
+          transparent 
+          opacity={0.15}
+        />
+      </mesh>
+      
+      {/* Soft glow effect */}
+      <mesh position={[0, -1.15, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[3.2, 64]} />
+        <meshBasicMaterial 
+          color="#FF4800" 
+          transparent 
+          opacity={0.05}
+        />
+      </mesh>
+      
+      {/* Main car model */}
+      <primitive 
+        ref={meshRef}
+        object={gltf.scene} 
+        scale={[1.8, 1.8, 1.8]} 
+        position={[0, -0.8, 0]} 
+        rotation={[0, 0, 0]}
+        castShadow
+        receiveShadow
+      />
+    </group>
   );
 };
 
@@ -282,16 +330,34 @@ const MainApp: React.FC = () => {
                   far: 1000
                 }}
                 dpr={[1, 2]}
+                shadows
+                gl={{ 
+                  antialias: true,
+                  alpha: true,
+                  preserveDrawingBuffer: true
+                }}
               >
-                <ambientLight intensity={0.6} />
+                <ambientLight intensity={0.4} />
                 <directionalLight 
                   position={[10, 10, 5]} 
-                  intensity={1}
+                  intensity={0.8}
                   castShadow
                   shadow-mapSize-width={2048}
                   shadow-mapSize-height={2048}
+                  shadow-camera-far={50}
+                  shadow-camera-left={-10}
+                  shadow-camera-right={10}
+                  shadow-camera-top={10}
+                  shadow-camera-bottom={-10}
                 />
                 <pointLight position={[-10, -10, -10]} intensity={0.3} />
+                <spotLight 
+                  position={[0, 10, 0]} 
+                  angle={0.3} 
+                  penumbra={1} 
+                  intensity={0.5}
+                  castShadow
+                />
                 
                 <Suspense fallback={<MiataFallback />}>
                   <MiataModel />
@@ -303,7 +369,7 @@ const MainApp: React.FC = () => {
                   enableRotate={false}
                   autoRotate={false}
                 />
-                <Environment preset="studio" />
+                <Environment preset="studio" background={false} />
               </Canvas>
             </ModelErrorBoundary>
           </CarContainer>
@@ -715,9 +781,15 @@ const MainHero = styled.div`
   grid-template-columns: 1.25fr 2fr;
   align-items: center;
   width: 100vw;
-  min-height: 70vh;
-  padding: 3vw 6vw;
+  min-height: 85vh; /* Increased from 70vh for more spacious feel */
+  padding: 4vw 6vw; /* Slightly increased padding */
   gap: 3vw;
+  
+  /* Enhanced spaciousness on larger screens */
+  @media (min-width: 1200px) {
+    min-height: 90vh;
+    padding: 5vw 8vw;
+  }
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -817,10 +889,32 @@ const OrangeAccent = styled(motion.div)`
   right: -10%;
   width: 120px;
   height: 8px;
-  background: #FF4800;
+  background: linear-gradient(90deg, #FF4800, #FF6B35);
   border-radius: 4px;
   z-index: 3;
   transform: translateX(50%);
+  overflow: hidden;
+  
+  /* Animated underline effect */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
   
   @media (max-width: 768px) {
     position: relative;
@@ -854,17 +948,33 @@ const CarContainer = styled.div`
   justify-content: center;
   margin-top: 2rem;
   
+  /* Enhanced grounding with soft glow */
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 20px;
+    background: radial-gradient(ellipse at center, rgba(255, 72, 0, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
   canvas {
     width: 100% !important;
     height: 100% !important;
     z-index: 2;
     position: relative;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
   }
   
   /* Style for PNG fallback */
   img {
     z-index: 2;
     position: relative;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
   }
   
   /* Fallback div styling */
