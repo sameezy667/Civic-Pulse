@@ -52,10 +52,16 @@ const MiataModel = () => {
             // Ensure material compatibility
             if (Array.isArray(mesh.material)) {
               mesh.material.forEach((mat) => {
-                if (mat.map) mat.map.flipY = false;
+                // Type-safe check for materials with map property
+                if ('map' in mat && mat.map) {
+                  (mat as any).map.flipY = false;
+                }
               });
             } else {
-              if (mesh.material.map) mesh.material.map.flipY = false;
+              // Type-safe check for single material with map property
+              if ('map' in mesh.material && mesh.material.map) {
+                (mesh.material as any).map.flipY = false;
+              }
             }
             mesh.castShadow = true;
             mesh.receiveShadow = true;
