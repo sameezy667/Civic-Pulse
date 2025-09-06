@@ -1,0 +1,67 @@
+{
+  "name": "civic-pulse-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.3.0",
+    "@react-three/postprocessing": "^3.0.4",
+    "@supabase/supabase-js": "^2.57.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.126",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@types/react-helmet": "^6.1.11",
+    "@types/react-lottie": "^1.2.10",
+    "@types/styled-components": "^5.1.34",
+    "@types/three": "^0.180.0",
+    "framer-motion": "^12.23.12",
+    "leaflet": "^1.9.4",
+    "lottie-react": "^2.4.1",
+    "lucide-react": "^0.542.0",
+    "postprocessing": "^6.37.7",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-helmet": "^6.1.0",
+    "react-hot-toast": "^2.6.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.8.2",
+    "react-scripts": "5.0.1",
+    "styled-components": "^6.1.19",
+    "three": "^0.180.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:network": "set HOST=0.0.0.0&& react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.20"
+  }
+}
