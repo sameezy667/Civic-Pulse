@@ -31,18 +31,7 @@ const MiataModel = () => {
   // Always call useGLTF at the top level
   const gltf = useGLTF('/models/miata.glb');
   
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.3; // Slow auto-rotation
-    }
-  });
-
-  // Handle potential loading errors gracefully
-  if (!gltf || !gltf.scene) {
-    return null;
-  }
-
-  // Ensure materials are compatible with Three.js v0.179
+  // Ensure materials are compatible with Three.js v0.179 - must be called before any returns
   useEffect(() => {
     if (gltf.scene) {
       gltf.scene.traverse((child) => {
@@ -70,6 +59,17 @@ const MiataModel = () => {
       });
     }
   }, [gltf.scene]);
+  
+  useFrame((state, delta) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += delta * 0.3; // Slow auto-rotation
+    }
+  });
+
+  // Handle potential loading errors gracefully
+  if (!gltf || !gltf.scene) {
+    return null;
+  }
 
   return (
     <group>
